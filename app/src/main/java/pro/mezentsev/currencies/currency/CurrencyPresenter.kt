@@ -6,6 +6,7 @@ import io.reactivex.disposables.CompositeDisposable
 import pro.mezentsev.currencies.currency.usecases.GetCurrencyInteractor
 import pro.mezentsev.currencies.di.scope.PerCurrency
 import pro.mezentsev.currencies.model.Currency
+import pro.mezentsev.currencies.model.Rate
 import javax.inject.Inject
 
 @PerCurrency
@@ -14,7 +15,6 @@ class CurrencyPresenter @Inject constructor(
 ) : CurrencyContract.Presenter() {
 
     private val subscriptions = CompositeDisposable()
-    private var amount = 1.0
     private var typedValue = "1.0"
 
     private var currency: Currency? = null
@@ -24,11 +24,11 @@ class CurrencyPresenter @Inject constructor(
         view?.showProgress()
 
         val subscribe = getCurrencyInteractor
-            .getCurrency(base, amount)
+            .getCurrency(base, typedValue)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ currency ->
                 this.currency = currency
-                view?.showCurrency(currency, amount, typedValue)
+                view?.showCurrency(currency, typedValue)
             }, {
                 Log.e(TAG, "Can't get currencies", it)
                 view?.showError(base)
@@ -37,15 +37,9 @@ class CurrencyPresenter @Inject constructor(
         subscriptions.add(subscribe)
     }
 
-    override fun ratesChanged(base: String, typedValue: String) {
-        this.amount = try {
-            typedValue.toDouble()
-        } catch (e: Exception) {
-            0.0
-        }
-
-        this.typedValue = if (amount == 0.0) "" else typedValue
-        load(base)
+    override fun ratesChanged(rate: Rate) {
+        this.typedValue = rate.typedValue
+        load(rate.base)
     }
 
     override fun detach() {

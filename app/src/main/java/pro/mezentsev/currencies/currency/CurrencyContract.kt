@@ -1,13 +1,13 @@
 package pro.mezentsev.currencies.currency
 
-import pro.mezentsev.currencies.model.Currency
 import pro.mezentsev.currencies.base.Contract
+import pro.mezentsev.currencies.model.Currency
+import pro.mezentsev.currencies.model.Rate
 
 interface CurrencyContract {
     interface View : Contract.BaseView {
         fun showCurrency(
             currency: Currency,
-            amount: Double,
             typedValue: String
         )
 
@@ -19,6 +19,6 @@ interface CurrencyContract {
     abstract class Presenter : Contract.BasePresenter<View>() {
         abstract fun load(base: String = "EUR")
 
-        abstract fun ratesChanged(base: String, typedValue: String)
+        abstract fun ratesChanged(rate: Rate)
     }
 }

@@ -11,7 +11,7 @@ class GetCurrencyInteractor @Inject constructor(
     private val currencyRepository: CurrencyRepository
 ) {
 
-    fun getCurrency(base: String, amount: Double = 1.0): Observable<Currency> =
+    fun getCurrency(base: String, amount: String = "1"): Observable<Currency> =
         currencyRepository
             .getCurrency(base, amount)
             .subscribeOn(Schedulers.io())

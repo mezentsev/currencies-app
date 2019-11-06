@@ -22,12 +22,11 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
 
     fun setCurrency(
         currency: Currency,
-        amount: Double,
         typedValue: String
     ) {
         this.amount = typedValue
 
-        val newRates = mutableListOf(Rate(currency.base, amount, typedValue))
+        val newRates = mutableListOf(Rate(currency.base, typedValue))
         newRates.addAll(currency.rates)
 
         notifyChanges(currency.base, this.currency?.rates, newRates)
@@ -84,11 +83,11 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
 
     private inner class HolderListenerHolder : HolderRatesListener {
         override fun onClicked(rate: Rate) {
-            ratesListener?.onClicked(rate.base, rate.value)
+            ratesListener?.onClicked(rate)
         }
 
-        override fun onTypedRate(base: String, typedAmount: String) {
-            ratesListener?.onRatesChanged(base, typedAmount)
+        override fun onTypedRate(rate: Rate) {
+            ratesListener?.onRatesChanged(rate)
         }
     }
 
@@ -136,13 +135,7 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
             val currentBase = rate?.base
             currentBase ?: return
 
-            val currentValue = try {
-                editCurrencyView.text.toString().toDouble()
-            } catch (e: Exception) {
-                0.0
-            }
-
-            holderRatesListener?.onClicked(Rate(currentBase, currentValue))
+            holderRatesListener?.onClicked(Rate(currentBase, editCurrencyView.text.toString()))
         }
 
         override fun afterTextChanged(s: Editable?) {
@@ -161,13 +154,13 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
             val currentBase = rate?.base
             currentBase ?: return
 
-            holderRatesListener?.onTypedRate(currentBase, editCurrencyView.text.toString())
+            holderRatesListener?.onTypedRate(Rate(currentBase, editCurrencyView.text.toString()))
         }
     }
 
     interface HolderRatesListener {
         fun onClicked(rate: Rate)
 
-        fun onTypedRate(base: String, typedAmount: String)
+        fun onTypedRate(rate: Rate)
     }
 }

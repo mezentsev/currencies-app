@@ -12,12 +12,13 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_list.view.*
 import pro.mezentsev.currencies.CurrencyApp
 import pro.mezentsev.currencies.R
-import pro.mezentsev.currencies.model.Currency
-import pro.mezentsev.currencies.currency.adapter.CurrencyAdapter
 import pro.mezentsev.currencies.base.BaseFragment
+import pro.mezentsev.currencies.currency.adapter.CurrencyAdapter
 import pro.mezentsev.currencies.currency.adapter.RatesListener
 import pro.mezentsev.currencies.di.component.CurrencyComponent.Companion.BASE_CURRENCY
 import pro.mezentsev.currencies.di.component.CurrencyComponent.Companion.TYPED_AMOUNT
+import pro.mezentsev.currencies.model.Currency
+import pro.mezentsev.currencies.model.Rate
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -66,19 +67,19 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
         super.onResume()
 
         currencyAdapter.setRatesListener(object : RatesListener {
-            override fun onClicked(base: String, currentValue: Double) {
-                this@CurrencyFragment.base = base
-                this@CurrencyFragment.typedAmount = currentValue.toString()
+            override fun onClicked(rate: Rate) {
+                this@CurrencyFragment.base = rate.base
+                this@CurrencyFragment.typedAmount = rate.typedValue
                 recyclerView.smoothScrollBy(0, 0)
-                presenter.ratesChanged(base, currentValue.toString())
+                presenter.ratesChanged(rate)
             }
 
-            override fun onRatesChanged(base: String, typedValue: String) {
-                presenter.ratesChanged(base, typedValue)
+            override fun onRatesChanged(rate: Rate) {
+                presenter.ratesChanged(rate)
             }
         })
         presenter.attach(this)
-        presenter.ratesChanged(base, typedAmount)
+        presenter.ratesChanged(Rate(base, typedAmount))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -103,13 +104,12 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
 
     override fun showCurrency(
         currency: Currency,
-        amount: Double,
         typedValue: String
     ) {
         hideProgress()
         base = currency.base
         typedAmount = typedValue
-        currencyAdapter.setCurrency(currency, amount, typedValue)
+        currencyAdapter.setCurrency(currency, typedValue)
     }
 
     override fun showProgress() {

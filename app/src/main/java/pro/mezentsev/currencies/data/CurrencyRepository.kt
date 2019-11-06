@@ -5,6 +5,6 @@ import pro.mezentsev.currencies.model.Currency
 
 interface CurrencyRepository {
 
-    fun getCurrency(base: String, amount: Double): Observable<Currency>
+    fun getCurrency(base: String, amount: String): Observable<Currency>
 
 }

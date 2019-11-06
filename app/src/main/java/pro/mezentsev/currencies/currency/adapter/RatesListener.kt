@@ -1,7 +1,9 @@
 package pro.mezentsev.currencies.currency.adapter
 
-interface RatesListener {
-    fun onClicked(base: String, currentValue: Double)
+import pro.mezentsev.currencies.model.Rate
 
-    fun onRatesChanged(base: String, typedValue: String)
+interface RatesListener {
+    fun onClicked(rate: Rate)
+
+    fun onRatesChanged(rate: Rate)
 }
