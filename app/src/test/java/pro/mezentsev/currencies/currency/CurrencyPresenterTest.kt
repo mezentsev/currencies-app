@@ -1,4 +1,4 @@
-package pro.mezentsev.currencies.currency.usecases
+package pro.mezentsev.currencies.currency
 
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
@@ -7,10 +7,9 @@ import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.junit.BeforeClass
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyDouble
+import pro.mezentsev.currencies.currency.usecases.ConvertCurrencyInteractor
+import pro.mezentsev.currencies.currency.usecases.GetCurrencyInteractor
 import pro.mezentsev.currencies.model.Currency
-import pro.mezentsev.currencies.currency.CurrencyContract
-import pro.mezentsev.currencies.currency.CurrencyPresenter
 import pro.mezentsev.currencies.model.Rate
 
 class CurrencyPresenterTest {
@@ -24,7 +23,8 @@ class CurrencyPresenterTest {
     }
 
     private val getCurrencyinteractor = mock<GetCurrencyInteractor>()
-    private val underTest: CurrencyContract.Presenter = CurrencyPresenter(getCurrencyinteractor)
+    private val convertCurrencyInteractor = mock<ConvertCurrencyInteractor>()
+    private val underTest: CurrencyContract.Presenter = CurrencyPresenter(getCurrencyinteractor, convertCurrencyInteractor)
 
     @Test
     fun `get currency from repository on load`() {
@@ -37,7 +37,7 @@ class CurrencyPresenterTest {
         underTest.attach(view)
         underTest.load(base)
 
-        verify(getCurrencyinteractor).getCurrency(eq(base), eq(1.0))
+        verify(getCurrencyinteractor).getCurrency(eq(base), eq("1"))
     }
 
     @Test
@@ -59,7 +59,7 @@ class CurrencyPresenterTest {
 
         verify(view).showProgress()
         verify(view, never()).showError(any())
-        verify(view).showCurrency(eq(currency), eq(1.0), eq("1.0"))
+        verify(view).showCurrency(eq(currency), eq("1"))
     }
 
     @Test
@@ -67,7 +67,7 @@ class CurrencyPresenterTest {
         val view = mock<CurrencyContract.View>()
         val base = "RUB"
         val typedAmount = "156"
-        val rates = listOf(Rate("EUR", 66.6))
+        val rates = listOf(Rate("EUR", 66.6.toBigDecimal(), "66.6"))
         val currency = Currency(
             base,
             rates
@@ -77,20 +77,20 @@ class CurrencyPresenterTest {
         whenever(getCurrencyinteractor.getCurrency(any(), any())).thenReturn(currencyObs)
 
         underTest.attach(view)
-        underTest.ratesChanged(base, typedAmount)
+        underTest.ratesChanged(Rate(base, typedAmount.toBigDecimal(), typedAmount))
 
         verify(view).showProgress()
         verify(view, never()).showError(any())
-        verify(view).showCurrency(eq(currency), eq(156.0), eq(typedAmount))
+        verify(view).showCurrency(eq(currency), eq(typedAmount))
     }
 
     @Test
     fun `change typed amount to empty if value is not valid`() {
         val view = mock<CurrencyContract.View>()
         val base = "RUB"
-        val brokenAmount = "#4dsdf"
+        val brokenAmount = "000"
         val typedAmount = ""
-        val rates = listOf(Rate("EUR", 66.6))
+        val rates = listOf(Rate("EUR", 66.6.toBigDecimal(), brokenAmount))
         val currency = Currency(
             base,
             rates
@@ -100,10 +100,10 @@ class CurrencyPresenterTest {
         whenever(getCurrencyinteractor.getCurrency(any(), any())).thenReturn(currencyObs)
 
         underTest.attach(view)
-        underTest.ratesChanged(base, brokenAmount)
+        underTest.ratesChanged(Rate(base, 1.0.toBigDecimal(), brokenAmount))
 
         verify(view).showProgress()
         verify(view, never()).showError(any())
-        verify(view).showCurrency(eq(currency), eq(0.0), eq(typedAmount))
+        verify(view).showCurrency(eq(currency), eq(brokenAmount))
     }
 }

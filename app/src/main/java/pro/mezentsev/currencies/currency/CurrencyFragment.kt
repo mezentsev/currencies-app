@@ -19,6 +19,7 @@ import pro.mezentsev.currencies.di.component.CurrencyComponent.Companion.BASE_CU
 import pro.mezentsev.currencies.di.component.CurrencyComponent.Companion.TYPED_AMOUNT
 import pro.mezentsev.currencies.model.Currency
 import pro.mezentsev.currencies.model.Rate
+import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -36,6 +37,18 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
     @Inject
     @Named(TYPED_AMOUNT)
     lateinit var typedAmount: String
+
+    private val onItemRangeMoved = object :
+        RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeMoved(
+            fromPosition: Int,
+            toPosition: Int,
+            itemCount: Int
+        ) {
+            super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+            recyclerView.smoothScrollBy(0, 0)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +83,6 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
             override fun onClicked(rate: Rate) {
                 this@CurrencyFragment.base = rate.base
                 this@CurrencyFragment.typedAmount = rate.typedValue
-                recyclerView.smoothScrollBy(0, 0)
                 presenter.ratesChanged(rate)
             }
 
@@ -78,8 +90,9 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
                 presenter.ratesChanged(rate)
             }
         })
+        currencyAdapter.registerAdapterDataObserver(onItemRangeMoved)
         presenter.attach(this)
-        presenter.ratesChanged(Rate(base, typedAmount))
+        presenter.ratesChanged(Rate(base, BigDecimal.ONE, typedAmount))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -90,6 +103,7 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
 
     override fun onPause() {
         super.onPause()
+        currencyAdapter.unregisterAdapterDataObserver(onItemRangeMoved)
         currencyAdapter.setRatesListener(null)
         presenter.detach()
     }

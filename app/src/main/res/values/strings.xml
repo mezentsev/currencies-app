@@ -3,7 +3,7 @@
 
     <string name="currency_activity_title">Rates</string>
 
-    <string name="error_loading_currency">Problem with loading currencies for %s</string>
+    <string name="error_loading_currency">Problem with loading actual rates for %s</string>
     <string name="error_loading_reload_action">Try again?</string>
 
     <string name="currency_edit_hint">0</string>

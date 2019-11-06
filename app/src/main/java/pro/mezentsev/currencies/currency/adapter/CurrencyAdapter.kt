@@ -25,11 +25,7 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
         typedValue: String
     ) {
         this.amount = typedValue
-
-        val newRates = mutableListOf(Rate(currency.base, typedValue))
-        newRates.addAll(currency.rates)
-
-        notifyChanges(currency.base, this.currency?.rates, newRates)
+        notifyChanges(currency.base, this.currency?.rates, currency.rates)
     }
 
     fun setRatesListener(ratesListener: RatesListener?) {
@@ -114,7 +110,7 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
             this.rate = rate
             this.holderRatesListener = listenerHolder
 
-            editCurrencyView.setOnFocusChangeListener { view, hasFocus ->
+            editCurrencyView.setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus && adapterPosition != 0) {
                     onHolderProceed()
                 }
@@ -125,17 +121,16 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
 
         override fun onClick(view: View?) {
             if (adapterPosition != 0) {
+                editCurrencyView.requestFocus()
                 onHolderProceed()
             }
         }
 
         private fun onHolderProceed() {
-            editCurrencyView.requestFocus()
+            val currentRate = rate
+            currentRate ?: return
 
-            val currentBase = rate?.base
-            currentBase ?: return
-
-            holderRatesListener?.onClicked(Rate(currentBase, editCurrencyView.text.toString()))
+            holderRatesListener?.onClicked(Rate(currentRate.base, currentRate.value, editCurrencyView.text.toString()))
         }
 
         override fun afterTextChanged(s: Editable?) {
@@ -151,10 +146,10 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
                 return
             }
 
-            val currentBase = rate?.base
-            currentBase ?: return
+            val currentRate = rate
+            currentRate ?: return
 
-            holderRatesListener?.onTypedRate(Rate(currentBase, editCurrencyView.text.toString()))
+            holderRatesListener?.onTypedRate(Rate(currentRate.base, currentRate.value, editCurrencyView.text.toString()))
         }
     }
 

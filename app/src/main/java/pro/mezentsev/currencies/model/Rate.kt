@@ -1,6 +1,5 @@
 package pro.mezentsev.currencies.model
 
-data class Rate(
-    val base: String,
-    val typedValue: String
-)
+import java.math.BigDecimal
+
+data class Rate(val base: String, val value: BigDecimal, val typedValue: String)
