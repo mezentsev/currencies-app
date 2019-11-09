@@ -17,7 +17,7 @@ interface CurrencyContract {
     }
 
     abstract class Presenter : Contract.BasePresenter<View>() {
-        abstract fun load(base: String = "EUR")
+        abstract fun load(base: String = "EUR", typedValue: String = "1")
 
         abstract fun ratesChanged(rate: Rate)
     }

@@ -19,7 +19,6 @@ import pro.mezentsev.currencies.di.component.CurrencyComponent.Companion.BASE_CU
 import pro.mezentsev.currencies.di.component.CurrencyComponent.Companion.TYPED_AMOUNT
 import pro.mezentsev.currencies.model.Currency
 import pro.mezentsev.currencies.model.Rate
-import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -80,19 +79,15 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
         super.onResume()
 
         currencyAdapter.setRatesListener(object : RatesListener {
-            override fun onClicked(rate: Rate) {
+            override fun onRatesChanged(rate: Rate) {
                 this@CurrencyFragment.base = rate.base
                 this@CurrencyFragment.typedAmount = rate.typedValue
-                presenter.ratesChanged(rate)
-            }
-
-            override fun onRatesChanged(rate: Rate) {
                 presenter.ratesChanged(rate)
             }
         })
         currencyAdapter.registerAdapterDataObserver(onItemRangeMoved)
         presenter.attach(this)
-        presenter.ratesChanged(Rate(base, BigDecimal.ONE, typedAmount))
+        presenter.load(base, typedAmount)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -147,7 +142,7 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
                     String.format(resources.getString(R.string.error_loading_currency), base),
                     Snackbar.LENGTH_INDEFINITE
                 )
-                .setAction(R.string.error_loading_reload_action) { presenter.load(base) }
+                .setAction(R.string.error_loading_reload_action) { presenter.load(this.base, typedAmount) }
                 .show()
         }
     }

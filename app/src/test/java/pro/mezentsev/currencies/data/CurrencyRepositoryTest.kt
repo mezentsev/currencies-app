@@ -38,7 +38,7 @@ class CurrencyRepositoryTest {
         val currencyObs = Observable.just(currencyResponse)
         val currency = Currency(base, rates)
 
-        whenever(convertCurrencyInteractor.convert(any(), any())).thenReturn(currency)
+        whenever(convertCurrencyInteractor.convert(any(), any(), any())).thenReturn(currency)
         whenever(currencyApi.getLatest(any())).thenReturn(currencyObs)
 
         val latest = underTest.getCurrency(base, typedAmount).blockingFirst()

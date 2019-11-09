@@ -79,7 +79,7 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
 
     private inner class HolderListenerHolder : HolderRatesListener {
         override fun onClicked(rate: Rate) {
-            ratesListener?.onClicked(rate)
+            ratesListener?.onRatesChanged(rate)
         }
 
         override fun onTypedRate(rate: Rate) {
