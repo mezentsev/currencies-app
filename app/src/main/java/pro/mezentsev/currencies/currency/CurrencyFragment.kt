@@ -6,6 +6,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -72,6 +73,9 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
             layoutManager = LinearLayoutManager(context)
             isFocusable = false
             isFocusableInTouchMode = false
+            itemAnimator = DefaultItemAnimator().apply {
+                supportsChangeAnimations = false
+            }
         }
 
         return view
