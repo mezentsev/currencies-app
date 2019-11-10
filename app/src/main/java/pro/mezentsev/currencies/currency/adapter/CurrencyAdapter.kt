@@ -62,6 +62,12 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                if (oldItemPosition == newItemPosition
+                    && oldItemPosition == 0
+                    && areItemsTheSame(0, 0)) {
+                    return true
+                }
+
                 return oldRates[oldItemPosition] == newRates[newItemPosition]
             }
 
