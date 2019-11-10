@@ -21,15 +21,18 @@ class CurrencyRepositoryTest {
 
     @Test
     fun `apply typed amount to rates`() {
-        val base = "EUR"
-        val rate1 = Rate("EUR", 133.20.toBigDecimal(), "133.20")
-        val rate2 = Rate("USD", 142.2.toBigDecimal(), "142.2")
-        val rates = listOf(rate1, rate2)
+        val EUR = Rate("EUR", 133.20.toBigDecimal(), "133.20")
+        val USD = Rate("USD", 142.2.toBigDecimal(), "142.2")
+        val rates = listOf(EUR, USD)
         val date = "12345678"
+
+        val base = EUR.base
+        val value = EUR.value
         val typedAmount = "2.0"
 
         val currencyResponse = CurrencyResponse(
-            base, date,
+            base,
+            date,
             mapOf(
                 Pair("EUR", 66.6),
                 Pair("USD", 71.1)
@@ -37,11 +40,12 @@ class CurrencyRepositoryTest {
         )
         val currencyObs = Observable.just(currencyResponse)
         val currency = Currency(base, rates)
+        val rate = Rate(base, value, typedAmount)
 
         whenever(convertCurrencyInteractor.convert(any(), any(), any())).thenReturn(currency)
         whenever(currencyApi.getLatest(any())).thenReturn(currencyObs)
 
-        val latest = underTest.getCurrency(base, typedAmount).blockingFirst()
+        val latest = underTest.getCurrency(rate).blockingFirst()
 
         assertEquals(base, latest.base)
         latest.rates.forEachIndexed { index, rate ->

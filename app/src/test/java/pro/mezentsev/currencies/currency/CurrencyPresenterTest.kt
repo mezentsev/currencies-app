@@ -7,10 +7,10 @@ import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.junit.BeforeClass
 import org.junit.Test
-import pro.mezentsev.currencies.currency.usecases.ConvertCurrencyInteractor
 import pro.mezentsev.currencies.currency.usecases.GetCurrencyInteractor
 import pro.mezentsev.currencies.model.Currency
 import pro.mezentsev.currencies.model.Rate
+import java.math.BigDecimal
 
 class CurrencyPresenterTest {
     companion object {
@@ -23,21 +23,20 @@ class CurrencyPresenterTest {
     }
 
     private val getCurrencyinteractor = mock<GetCurrencyInteractor>()
-    private val convertCurrencyInteractor = mock<ConvertCurrencyInteractor>()
-    private val underTest: CurrencyContract.Presenter = CurrencyPresenter(getCurrencyinteractor, convertCurrencyInteractor)
+    private val underTest: CurrencyContract.Presenter = CurrencyPresenter(getCurrencyinteractor)
 
     @Test
     fun `get currency from repository on load`() {
         val view = mock<CurrencyContract.View>()
         val base = "USD"
+        val rate = Rate(base, BigDecimal.ONE, "1")
 
-        whenever(getCurrencyinteractor.getCurrency(any(), any()))
-            .thenReturn(Observable.just(mock()))
+        whenever(getCurrencyinteractor.getCurrency(any())).thenReturn(Observable.just(mock()))
 
         underTest.attach(view)
         underTest.load(base)
 
-        verify(getCurrencyinteractor).getCurrency(eq(base), eq("1"))
+        verify(getCurrencyinteractor).getCurrency(eq(rate))
     }
 
     @Test
@@ -50,7 +49,7 @@ class CurrencyPresenterTest {
         )
         val currencyObs = Observable.just(currency)
 
-        whenever(getCurrencyinteractor.getCurrency(any(), any())).thenReturn(currencyObs)
+        whenever(getCurrencyinteractor.getCurrency(any())).thenReturn(currencyObs)
 
         underTest.attach(view)
         underTest.load(base)
@@ -74,7 +73,7 @@ class CurrencyPresenterTest {
         )
         val currencyObs = Observable.just(currency)
 
-        whenever(getCurrencyinteractor.getCurrency(any(), any())).thenReturn(currencyObs)
+        whenever(getCurrencyinteractor.getCurrency(any())).thenReturn(currencyObs)
 
         underTest.attach(view)
         underTest.ratesChanged(Rate(base, typedAmount.toBigDecimal(), typedAmount))
@@ -89,7 +88,6 @@ class CurrencyPresenterTest {
         val view = mock<CurrencyContract.View>()
         val base = "RUB"
         val brokenAmount = "000"
-        val typedAmount = ""
         val rates = listOf(Rate("EUR", 66.6.toBigDecimal(), brokenAmount))
         val currency = Currency(
             base,
@@ -97,7 +95,7 @@ class CurrencyPresenterTest {
         )
         val currencyObs = Observable.just(currency)
 
-        whenever(getCurrencyinteractor.getCurrency(any(), any())).thenReturn(currencyObs)
+        whenever(getCurrencyinteractor.getCurrency(any())).thenReturn(currencyObs)
 
         underTest.attach(view)
         underTest.ratesChanged(Rate(base, 1.0.toBigDecimal(), brokenAmount))
