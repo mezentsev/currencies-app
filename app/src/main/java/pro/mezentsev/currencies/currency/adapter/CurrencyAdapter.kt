@@ -11,20 +11,15 @@ import kotlinx.android.synthetic.main.currency_view.view.*
 import pro.mezentsev.currencies.R
 import pro.mezentsev.currencies.model.Currency
 import pro.mezentsev.currencies.model.Rate
+import pro.mezentsev.currencies.util.showKeyboard
 
 class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
 
     private var currency: Currency? = null
     private val holderClickListener = HolderListenerHolder()
-    private var amount: String? = null
-
     private var ratesListener: RatesListener? = null
 
-    fun setCurrency(
-        currency: Currency,
-        typedValue: String
-    ) {
-        this.amount = typedValue
+    fun setCurrency(currency: Currency) {
         notifyChanges(currency.base, this.currency?.rates, currency.rates)
     }
 
@@ -121,7 +116,7 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.RatesHolder>() {
 
         override fun onClick(view: View?) {
             if (adapterPosition != 0) {
-                editCurrencyView.requestFocus()
+                editCurrencyView.showKeyboard()
                 onHolderProceed()
             }
         }

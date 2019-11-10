@@ -70,6 +70,8 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
         recyclerView = view.list.apply {
             adapter = currencyAdapter
             layoutManager = LinearLayoutManager(context)
+            isFocusable = false
+            isFocusableInTouchMode = false
         }
 
         return view
@@ -118,7 +120,7 @@ class CurrencyFragment : BaseFragment(), CurrencyContract.View {
         hideProgress()
         base = currency.base
         typedAmount = typedValue
-        currencyAdapter.setCurrency(currency, typedValue)
+        currencyAdapter.setCurrency(currency)
     }
 
     override fun showProgress() {
